@@ -1,0 +1,2 @@
+# CourseReg
+Mini student App
