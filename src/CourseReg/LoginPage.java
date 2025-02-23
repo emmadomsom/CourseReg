@@ -19,7 +19,7 @@ public class LoginPage extends javax.swing.JFrame {
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/user_db","root","Emmadom1234@");
-            String sql = "SELECT username, password, name FROM user WHERE username = ? AND password = ?";
+            String sql = "SELECT username, password, name, level FROM user WHERE username = ? AND password = ?";
             PreparedStatement pst = con.prepareStatement(sql);
             
             pst.setString(1, username);
@@ -28,10 +28,13 @@ public class LoginPage extends javax.swing.JFrame {
             if(rs.next()){
                 lbl_usererror.setText("");
                 
-                System.out.println("Setting regno in UserSession: " + username);
                 UserSession.setRegNo(username);
-                UserSession.setName(rs.getString("name"));  // Add this line
+                UserSession.setName(rs.getString("name"));
+                UserSession.setLevel(rs.getString("level"));  // Store the level
+                
+                System.out.println("Setting regno in UserSession: " + username);
                 System.out.println("Stored name: " + UserSession.getName());
+                System.out.println("Stored level: " + UserSession.getLevel());  // Log level for debugging
                 
                 JOptionPane.showMessageDialog(this,"Login Successful!", "Success", JOptionPane.INFORMATION_MESSAGE );
                 
@@ -64,6 +67,7 @@ public class LoginPage extends javax.swing.JFrame {
         btn_back = new javax.swing.JButton();
         txt_password = new javax.swing.JPasswordField();
         chk_showPassword = new javax.swing.JCheckBox();
+        btn_newstudent = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 204, 0));
@@ -125,7 +129,7 @@ public class LoginPage extends javax.swing.JFrame {
                 btn_backActionPerformed(evt);
             }
         });
-        jPanel2.add(btn_back, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 339, 100, 30));
+        jPanel2.add(btn_back, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 340, 100, 30));
 
         txt_password.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jPanel2.add(txt_password, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 200, 390, 30));
@@ -140,6 +144,17 @@ public class LoginPage extends javax.swing.JFrame {
         jPanel2.add(chk_showPassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 230, -1, -1));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 170, 580, 380));
+
+        btn_newstudent.setBackground(new java.awt.Color(0, 102, 102));
+        btn_newstudent.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        btn_newstudent.setForeground(new java.awt.Color(255, 255, 255));
+        btn_newstudent.setText("NEW STUDENT");
+        btn_newstudent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_newstudentActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btn_newstudent, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 620, 220, -1));
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 700));
 
@@ -167,6 +182,7 @@ public class LoginPage extends javax.swing.JFrame {
     private void btn_backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_backActionPerformed
         IntroPage intro = new IntroPage();
         intro.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btn_backActionPerformed
 
     private void chk_showPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chk_showPasswordActionPerformed
@@ -176,6 +192,13 @@ public class LoginPage extends javax.swing.JFrame {
         txt_password.setEchoChar('*'); // Mask password
         }
     }//GEN-LAST:event_chk_showPasswordActionPerformed
+
+    private void btn_newstudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_newstudentActionPerformed
+        NewStudent newstudent = new NewStudent();
+        newstudent.setVisible(true);
+        this.dispose();
+        
+    }//GEN-LAST:event_btn_newstudentActionPerformed
 
     /**
      * @param args the command line arguments
@@ -215,6 +238,7 @@ public class LoginPage extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_back;
     private javax.swing.JButton btn_login;
+    private javax.swing.JButton btn_newstudent;
     private javax.swing.JCheckBox chk_showPassword;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

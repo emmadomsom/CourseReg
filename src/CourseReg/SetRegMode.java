@@ -97,8 +97,8 @@ public class SetRegMode extends javax.swing.JFrame {
     }//GEN-LAST:event_combo_semester1ActionPerformed
 
     private void btn_back1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_back1ActionPerformed
-        ViewApprovePage view = new ViewApprovePage();
-        view.setVisible(true);
+        AdminPage admin = new AdminPage();
+        admin.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btn_back1ActionPerformed
 
@@ -117,10 +117,6 @@ public class SetRegMode extends javax.swing.JFrame {
         "Success",
         JOptionPane.INFORMATION_MESSAGE);
         
-    // Return to previous page
-    ViewApprovePage view = new ViewApprovePage();
-    view.setVisible(true);
-    this.dispose();
     }//GEN-LAST:event_btn_load1ActionPerformed
 
     private void combo_session1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combo_session1ActionPerformed

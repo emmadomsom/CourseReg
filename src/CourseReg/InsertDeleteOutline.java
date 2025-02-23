@@ -24,8 +24,6 @@ public class InsertDeleteOutline extends javax.swing.JFrame {
         panelDelete = new javax.swing.JPanel();
         lbl_deleteoutline = new javax.swing.JLabel();
         btn_back = new javax.swing.JButton();
-        panelView = new javax.swing.JPanel();
-        lbl_viewoutline = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -43,8 +41,9 @@ public class InsertDeleteOutline extends javax.swing.JFrame {
         panelInsert.setBackground(new java.awt.Color(0, 102, 102));
         panelInsert.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lbl_insertoutline.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        lbl_insertoutline.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
         lbl_insertoutline.setForeground(new java.awt.Color(255, 255, 255));
+        lbl_insertoutline.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbl_insertoutline.setText("INSERT COURSE OUTLINE");
         lbl_insertoutline.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -57,15 +56,16 @@ public class InsertDeleteOutline extends javax.swing.JFrame {
                 lbl_insertoutlineMouseExited(evt);
             }
         });
-        panelInsert.add(lbl_insertoutline, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 50, 330, 170));
+        panelInsert.add(lbl_insertoutline, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 40, 420, 230));
 
-        getContentPane().add(panelInsert, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 390, 420, 260));
+        getContentPane().add(panelInsert, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 380, 510, 300));
 
         panelDelete.setBackground(new java.awt.Color(0, 102, 102));
         panelDelete.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lbl_deleteoutline.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        lbl_deleteoutline.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
         lbl_deleteoutline.setForeground(new java.awt.Color(255, 255, 255));
+        lbl_deleteoutline.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbl_deleteoutline.setText("DELETE COURSE OUTLINE");
         lbl_deleteoutline.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -78,9 +78,9 @@ public class InsertDeleteOutline extends javax.swing.JFrame {
                 lbl_deleteoutlineMouseExited(evt);
             }
         });
-        panelDelete.add(lbl_deleteoutline, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 50, 330, 170));
+        panelDelete.add(lbl_deleteoutline, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, 430, 250));
 
-        getContentPane().add(panelDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(1120, 390, 420, 260));
+        getContentPane().add(panelDelete, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 380, 510, 300));
 
         btn_back.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btn_back.setText("BACK");
@@ -90,28 +90,6 @@ public class InsertDeleteOutline extends javax.swing.JFrame {
             }
         });
         getContentPane().add(btn_back, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 790, 130, 40));
-
-        panelView.setBackground(new java.awt.Color(0, 102, 102));
-        panelView.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        lbl_viewoutline.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        lbl_viewoutline.setForeground(new java.awt.Color(255, 255, 255));
-        lbl_viewoutline.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbl_viewoutline.setText("VIEW COURSE OUTLINE");
-        lbl_viewoutline.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lbl_viewoutlineMouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                lbl_viewoutlineMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                lbl_viewoutlineMouseExited(evt);
-            }
-        });
-        panelView.add(lbl_viewoutline, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 50, 330, 170));
-
-        getContentPane().add(panelView, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 390, 420, 260));
 
         setBounds(0, 0, 1601, 909);
     }// </editor-fold>//GEN-END:initComponents
@@ -154,22 +132,6 @@ public class InsertDeleteOutline extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_btn_backMouseClicked
 
-    private void lbl_viewoutlineMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_viewoutlineMouseClicked
-        ConfirmViewOutline confirm = new ConfirmViewOutline();
-        confirm.setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_lbl_viewoutlineMouseClicked
-
-    private void lbl_viewoutlineMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_viewoutlineMouseEntered
-        Color clr = new Color(0,51,51);
-        panelView.setBackground(clr);
-    }//GEN-LAST:event_lbl_viewoutlineMouseEntered
-
-    private void lbl_viewoutlineMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_viewoutlineMouseExited
-        Color clr = new Color(0,102,102);
-        panelView.setBackground(clr);
-    }//GEN-LAST:event_lbl_viewoutlineMouseExited
-
     
     public static void main(String args[]) {
         
@@ -205,9 +167,7 @@ public class InsertDeleteOutline extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lbl_deleteoutline;
     private javax.swing.JLabel lbl_insertoutline;
-    private javax.swing.JLabel lbl_viewoutline;
     private javax.swing.JPanel panelDelete;
     private javax.swing.JPanel panelInsert;
-    private javax.swing.JPanel panelView;
     // End of variables declaration//GEN-END:variables
 }

@@ -61,7 +61,7 @@ public class HomePage extends javax.swing.JFrame {
 
         lbl_student.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         lbl_student.setForeground(new java.awt.Color(255, 255, 255));
-        lbl_student.setText("STUDENT DETAILS");
+        lbl_student.setText("VIEW STUDENT DETAILS");
         lbl_student.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lbl_studentMouseClicked(evt);
@@ -73,14 +73,16 @@ public class HomePage extends javax.swing.JFrame {
                 lbl_studentMouseExited(evt);
             }
         });
-        panel_student.add(lbl_student, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, 230, 150));
+        panel_student.add(lbl_student, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 50, 300, 150));
 
         getContentPane().add(panel_student, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 380, 390, 240));
 
         panel_coursereg.setBackground(new java.awt.Color(0, 102, 102));
+        panel_coursereg.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lbl_coursereg.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        lbl_coursereg.setFont(new java.awt.Font("Tahoma", 0, 28)); // NOI18N
         lbl_coursereg.setForeground(new java.awt.Color(255, 255, 255));
+        lbl_coursereg.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbl_coursereg.setText("COURSE REGISTRATION");
         lbl_coursereg.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -93,23 +95,7 @@ public class HomePage extends javax.swing.JFrame {
                 lbl_courseregMouseExited(evt);
             }
         });
-
-        javax.swing.GroupLayout panel_courseregLayout = new javax.swing.GroupLayout(panel_coursereg);
-        panel_coursereg.setLayout(panel_courseregLayout);
-        panel_courseregLayout.setHorizontalGroup(
-            panel_courseregLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_courseregLayout.createSequentialGroup()
-                .addContainerGap(71, Short.MAX_VALUE)
-                .addComponent(lbl_coursereg, javax.swing.GroupLayout.PREFERRED_SIZE, 288, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(41, 41, 41))
-        );
-        panel_courseregLayout.setVerticalGroup(
-            panel_courseregLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_courseregLayout.createSequentialGroup()
-                .addGap(42, 42, 42)
-                .addComponent(lbl_coursereg, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(48, Short.MAX_VALUE))
-        );
+        panel_coursereg.add(lbl_coursereg, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 350, 180));
 
         getContentPane().add(panel_coursereg, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 380, 400, 240));
 
@@ -119,9 +105,11 @@ public class HomePage extends javax.swing.JFrame {
                 panel_outlineMouseEntered(evt);
             }
         });
+        panel_outline.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lbl_outline.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        lbl_outline.setFont(new java.awt.Font("Tahoma", 0, 28)); // NOI18N
         lbl_outline.setForeground(new java.awt.Color(255, 255, 255));
+        lbl_outline.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbl_outline.setText("COURSE OUTLINE");
         lbl_outline.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -134,23 +122,7 @@ public class HomePage extends javax.swing.JFrame {
                 lbl_outlineMouseExited(evt);
             }
         });
-
-        javax.swing.GroupLayout panel_outlineLayout = new javax.swing.GroupLayout(panel_outline);
-        panel_outline.setLayout(panel_outlineLayout);
-        panel_outlineLayout.setHorizontalGroup(
-            panel_outlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel_outlineLayout.createSequentialGroup()
-                .addContainerGap(99, Short.MAX_VALUE)
-                .addComponent(lbl_outline, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(71, 71, 71))
-        );
-        panel_outlineLayout.setVerticalGroup(
-            panel_outlineLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panel_outlineLayout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(lbl_outline, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(25, Short.MAX_VALUE))
-        );
+        panel_outline.add(lbl_outline, new org.netbeans.lib.awtextra.AbsoluteConstraints(49, 30, 320, 185));
 
         getContentPane().add(panel_outline, new org.netbeans.lib.awtextra.AbsoluteConstraints(1110, 380, 400, 240));
 
@@ -177,11 +149,6 @@ public class HomePage extends javax.swing.JFrame {
         setBounds(0, 0, 1601, 909);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void lbl_studentMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_studentMouseEntered
-        Color clr = new Color(0,51,51);
-        panel_student.setBackground(clr);
-    }//GEN-LAST:event_lbl_studentMouseEntered
-
     private void lbl_courseregMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_courseregMouseEntered
         Color clr = new Color(0,51,51);
         panel_coursereg.setBackground(clr);
@@ -201,11 +168,6 @@ public class HomePage extends javax.swing.JFrame {
         panel_outline.setBackground(clr);
     }//GEN-LAST:event_lbl_outlineMouseEntered
 
-    private void lbl_studentMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_studentMouseExited
-        Color clr = new Color(0,102,102);
-        panel_student.setBackground(clr);
-    }//GEN-LAST:event_lbl_studentMouseExited
-
     private void lbl_outlineMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_outlineMouseExited
         Color clr = new Color(0,102,102);
         panel_outline.setBackground(clr);
@@ -223,17 +185,27 @@ public class HomePage extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_lbl_outlineMouseClicked
 
-    private void lbl_studentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_studentMouseClicked
-        Details details = new Details();
-        details.setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_lbl_studentMouseClicked
-
     private void btn_backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_backActionPerformed
         LoginPage login = new LoginPage();
         login.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btn_backActionPerformed
+
+    private void lbl_studentMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_studentMouseExited
+        Color clr = new Color(0,102,102);
+        panel_student.setBackground(clr);
+    }//GEN-LAST:event_lbl_studentMouseExited
+
+    private void lbl_studentMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_studentMouseEntered
+        Color clr = new Color(0,51,51);
+        panel_student.setBackground(clr);
+    }//GEN-LAST:event_lbl_studentMouseEntered
+
+    private void lbl_studentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_studentMouseClicked
+        Details details = new Details();
+        details.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_lbl_studentMouseClicked
 
     
     public static void main(String args[]) {

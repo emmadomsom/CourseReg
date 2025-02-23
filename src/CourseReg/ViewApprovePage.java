@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.table.TableCellRenderer;
 import java.awt.Component;
+import java.util.Vector;
 
 
 public class ViewApprovePage extends javax.swing.JFrame {
@@ -124,23 +125,35 @@ public class ViewApprovePage extends javax.swing.JFrame {
             
             ResultSet rs = pstmt.executeQuery();
             
-            StringBuilder courses = new StringBuilder();
-            courses.append("Registered Courses:\n\n");
-            
-            while (rs.next()) {
-                courses.append(String.format("Course Code: %s\n", rs.getString("course_code")));
-                courses.append(String.format("Course Name: %s\n", rs.getString("course_name")));
-                courses.append(String.format("Unit Load: %d\n", rs.getInt("unit_load")));
-                courses.append("------------------------\n");
+            DefaultTableModel courseModel = new DefaultTableModel(
+            new Object[][] {},
+            new String[] {"Course Code", "Course Name", "Unit Load", "Action"}
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 3; // Only allow editing of delete button column
             }
+        };
+            JTable courseTable = new JTable(courseModel);
             
-            JTextArea textArea = new JTextArea(courses.toString());
-            textArea.setEditable(false);
-            textArea.setLineWrap(true);
-            textArea.setWrapStyleWord(true);
-            
-            JScrollPane scrollPane = new JScrollPane(textArea);
-            scrollPane.setPreferredSize(new java.awt.Dimension(400, 300));
+            courseTable.getColumnModel().getColumn(3).setCellRenderer(new ButtonRenderer("Delete"));
+            courseTable.getColumnModel().getColumn(3).setCellEditor(new ButtonEditor(new JCheckBox()) {
+            @Override
+            protected void onClick(int courseRow) {
+                deleteCourse(courseRow, courseTable, regNo, session, semester);
+            }
+        });
+            while (rs.next()) {
+            courseModel.addRow(new Object[]{
+                rs.getString("course_code"),
+                rs.getString("course_name"),
+                rs.getInt("unit_load"),
+                "Delete"
+            });
+        }
+                    
+            JScrollPane scrollPane = new JScrollPane(courseTable);
+            scrollPane.setPreferredSize(new java.awt.Dimension(600, 300));
             
             // Create a panel to hold the textArea and approve button
             JPanel panel = new JPanel();
@@ -168,14 +181,47 @@ public class ViewApprovePage extends javax.swing.JFrame {
             dialog.setLocationRelativeTo(this);
             dialog.setVisible(true);
             
-            JOptionPane.showMessageDialog(this, panel, 
-                "Courses for " + jTable1.getValueAt(row, 0).toString(), 
-                JOptionPane.INFORMATION_MESSAGE);
-            
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error viewing courses: " + e.getMessage());
         }
+    }
+    
+    private void deleteCourse(int courseRow, JTable courseTable, String regNo, String session, String semester){
+        String courseCode = courseTable.getValueAt(courseRow, 0).toString();
+        int confirm = JOptionPane.showConfirmDialog(this,
+        "Are you sure you want to delete " + courseCode + "?",
+        "Confirm Deletion",
+        JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+        try {
+            String deleteQuery = "DELETE FROM registrations WHERE reg_no = ? AND session = ? " +
+                               "AND semester = ? AND course_code = ?";
+            PreparedStatement pstmt = conn.prepareStatement(deleteQuery);
+            pstmt.setString(1, regNo);
+            pstmt.setString(2, session);
+            pstmt.setString(3, semester);
+            pstmt.setString(4, courseCode);
+            
+            int deleted = pstmt.executeUpdate();
+            
+            if (deleted > 0) {
+                JOptionPane.showMessageDialog(this, "Course deleted successfully!");
+                // Remove the row from the course table
+                DefaultTableModel model = (DefaultTableModel) courseTable.getModel();
+                model.removeRow(courseRow);
+                
+                // Refresh the main registration table
+                loadRegistrations();
+                } else {
+                JOptionPane.showMessageDialog(this, "Failed to delete course. Please try again.");
+            }
+            } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error deleting course: " + e.getMessage());
+        }
+       }
     }
     
     private void approveCourses(int row) {
@@ -282,7 +328,6 @@ public class ViewApprovePage extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        btn_registrationmode = new javax.swing.JButton();
         btn_back = new javax.swing.JButton();
         btn_clear = new javax.swing.JButton();
 
@@ -318,17 +363,6 @@ public class ViewApprovePage extends javax.swing.JFrame {
 
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 230, 1420, 490));
 
-        btn_registrationmode.setBackground(new java.awt.Color(0, 102, 102));
-        btn_registrationmode.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        btn_registrationmode.setForeground(new java.awt.Color(255, 255, 255));
-        btn_registrationmode.setText("SET REGISTRATION MODE");
-        btn_registrationmode.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_registrationmodeActionPerformed(evt);
-            }
-        });
-        getContentPane().add(btn_registrationmode, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 730, 380, 40));
-
         btn_back.setBackground(new java.awt.Color(0, 102, 102));
         btn_back.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         btn_back.setForeground(new java.awt.Color(255, 255, 255));
@@ -349,16 +383,10 @@ public class ViewApprovePage extends javax.swing.JFrame {
                 btn_clearActionPerformed(evt);
             }
         });
-        getContentPane().add(btn_clear, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 780, 310, 40));
+        getContentPane().add(btn_clear, new org.netbeans.lib.awtextra.AbsoluteConstraints(1160, 730, 310, 40));
 
         setBounds(0, 0, 1601, 909);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btn_registrationmodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_registrationmodeActionPerformed
-        SetRegMode regpage = new SetRegMode();
-        regpage.setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_btn_registrationmodeActionPerformed
 
     private void btn_backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_backActionPerformed
         AdminPage admin = new AdminPage();
@@ -367,13 +395,28 @@ public class ViewApprovePage extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_backActionPerformed
 
     private void btn_clearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_clearActionPerformed
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        model.setRowCount(0);
-        
-        JOptionPane.showMessageDialog(this, 
-        "Table cleared. Click 'Refresh' or restart the page to view the registrations again.",
-        "Table Cleared",
-        JOptionPane.INFORMATION_MESSAGE);
+        try{
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            Vector<String> headers = new Vector<>();
+            for (int i = 0; i < model.getColumnCount(); i++) {
+            headers.add(model.getColumnName(i));
+            }
+            
+            model.setRowCount(0);
+            jTable1.revalidate();
+            jTable1.repaint();
+            
+            JOptionPane.showMessageDialog(this, 
+                    "Table cleared. Click 'Refresh' or restart the page to view the registrations again.",
+                    "Table Cleared",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }catch (Exception e) {
+        // Handle any potential errors
+        JOptionPane.showMessageDialog(this,
+            "Error clearing table: " + e.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_btn_clearActionPerformed
 
     
@@ -406,7 +449,6 @@ public class ViewApprovePage extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_back;
     private javax.swing.JButton btn_clear;
-    private javax.swing.JButton btn_registrationmode;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;

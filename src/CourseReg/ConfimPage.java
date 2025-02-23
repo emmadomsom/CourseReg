@@ -24,10 +24,27 @@ public class ConfimPage extends javax.swing.JFrame {
         
     }
     
+    private boolean validateStudentLevel(String selectedLevel) {
+        String studentLevel = UserSession.getLevel(); // Assuming this method exists in UserSession
+        
+        if (!selectedLevel.equals(studentLevel)) {
+            JOptionPane.showMessageDialog(this,
+                "You can only register for courses in your current level (" + studentLevel + ").",
+                "Invalid Level Selection",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+    
     private boolean loadCourses(){
         String level = combo_level.getSelectedItem().toString();
         String session = combo_session.getSelectedItem().toString();
         String semester = combo_semester.getSelectedItem().toString();
+        
+        if (!validateStudentLevel(level)) {
+            return false;
+        }
         
          if (!validateRegistrationPeriod(session, semester)) {
             return false;

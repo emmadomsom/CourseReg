@@ -3,13 +3,18 @@ package CourseReg;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 
 
 public class ViewOutline extends javax.swing.JFrame {
     private JTable courseTable;
     private JScrollPane scrollPane;
+    private Map<String, String> courseOutlines = new HashMap<>(); 
     
     public ViewOutline() {
         initComponents();
@@ -21,20 +26,42 @@ public class ViewOutline extends javax.swing.JFrame {
     }
     
     private void displayCourses(java.util.List<Object[]> courseData) {
-            String[] columnNames = {"Course Code", "Course Name", "Course Description"};
-            DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+        for (Object[] row : courseData) {
+        courseOutlines.put((String)row[0], (String)row[2]);  // Store course code -> outline
+        }
+        
+            String[] columnNames = {"Course Code", "Course Name", "Course Outline"};
+            DefaultTableModel model = new DefaultTableModel(columnNames, 0){
+                @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 2;
+            }
+            @Override
+            public Class<?> getColumnClass(int column) {
+                return column == 2 ? JButton.class : Object.class;
+            }
+         };
             
             for (Object[] row : courseData){
-                model.addRow(row);
+                Object[] newRow = new Object[3]; 
+                newRow[0] = row[0]; // Course Code
+                newRow[1] = row[1]; // Course Name
+                newRow[2] = "View"; // View button for Course Outline
+                model.addRow(newRow);
             }
             
             viewPanel.removeAll();
             
             courseTable = new JTable(model);
-            courseTable.setRowHeight(30);
-            courseTable.getColumnModel().getColumn(0).setPreferredWidth(100);
-            courseTable.getColumnModel().getColumn(1).setPreferredWidth(200);
-            courseTable.getColumnModel().getColumn(2).setPreferredWidth(500);
+            courseTable.setRowHeight(40);
+            
+            courseTable.getColumnModel().getColumn(0).setPreferredWidth(150);
+            courseTable.getColumnModel().getColumn(1).setPreferredWidth(300);
+            courseTable.getColumnModel().getColumn(2).setPreferredWidth(150);
+            
+            TableColumn outlineColumn = courseTable.getColumnModel().getColumn(2);
+            outlineColumn.setCellRenderer(new ButtonRenderer());
+            outlineColumn.setCellEditor(new ButtonEditor());
             
             scrollPane = new JScrollPane(courseTable);
             
@@ -45,10 +72,129 @@ public class ViewOutline extends javax.swing.JFrame {
             viewPanel.repaint();
         
     }
-
-
-
     
+    class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+            setBackground(new Color(0, 102, 102));
+            setForeground(Color.WHITE);
+            setForeground(Color.WHITE);
+            setFont(new Font("Tahoma", Font.BOLD, 12));
+        }
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+            setText("View");
+            return this;
+        }
+    }
+    
+    class ButtonEditor extends DefaultCellEditor {
+        protected JButton button;
+        
+        public ButtonEditor() {
+            super(new JCheckBox());
+            button = new JButton("view");
+            button.setOpaque(true);
+            button.setBackground(new Color(0, 102, 102));
+            button.setForeground(Color.WHITE);
+            button.setFont(new Font("Tahoma", Font.BOLD, 12));
+            
+            button.addActionListener(e -> {
+                int row = courseTable.getSelectedRow();
+                if (row != -1) {
+                    String courseCode = (String) courseTable.getValueAt(row, 0);
+                    String courseName = (String) courseTable.getValueAt(row, 1);
+                    displayCourseOutline(courseCode, courseName);
+            }
+              fireEditingStopped();  
+            });
+        }
+        
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                boolean isSelected, int row, int column) {
+            return button;
+        }
+        
+        @Override
+        public Object getCellEditorValue() {
+            return "View";
+        }
+        
+    }
+    
+    private void displayCourseOutline(String courseCode, String courseName) {
+        // Create a new frame to display the course outline
+        JFrame outlineFrame = new JFrame("Course Outline - " + courseCode);
+        outlineFrame.setSize(800, 600);
+        outlineFrame.setLocationRelativeTo(this);
+        
+        // Create main panel with padding
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        // Create header panel
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(0, 102, 102));
+        headerPanel.setLayout(new BorderLayout());
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        JLabel titleLabel = new JLabel("Course Outline");
+        titleLabel.setFont(new Font("Tahoma", Font.BOLD, 24));
+        titleLabel.setForeground(Color.WHITE);
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
+        
+        // Create content panel
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new GridLayout(0, 1, 10, 10));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        
+        // Add course details
+        contentPanel.add(createDetailLabel("Course Code: " + courseCode));
+        contentPanel.add(createDetailLabel("Course Name: " + courseName));
+        
+        String outline = courseOutlines.get(courseCode);
+        if (outline != null) {
+        // Split the outline by newlines if it contains multiple lines
+        String[] outlinePoints = outline.split("\n");
+        for (String point : outlinePoints) {
+            contentPanel.add(createDetailLabel(point.trim()));
+             }
+        } else {
+        contentPanel.add(createDetailLabel("No outline available for this course."));
+        }
+        
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        
+        // Add components to main panel
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        // Add back button
+        JButton backButton = new JButton("Back");
+        backButton.setBackground(new Color(0, 102, 102));
+        backButton.setForeground(Color.WHITE);
+        backButton.setFont(new Font("Tahoma", Font.BOLD, 14));
+        backButton.addActionListener(e -> outlineFrame.dispose());
+        
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.add(backButton);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        outlineFrame.add(mainPanel);
+        outlineFrame.setVisible(true);
+    }
+    private JLabel createDetailLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        return label;
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -107,8 +253,8 @@ public class ViewOutline extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        ConfirmViewOutline confirmView = new ConfirmViewOutline();
-        confirmView.setVisible(true);
+        AdminPage admin = new AdminPage();
+        admin.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 

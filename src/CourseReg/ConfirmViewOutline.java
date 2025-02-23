@@ -274,8 +274,8 @@ public class ConfirmViewOutline extends javax.swing.JFrame {
     }//GEN-LAST:event_combo_level1ActionPerformed
 
     private void btn_back1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_back1ActionPerformed
-        InsertDeleteOutline insertdelete = new InsertDeleteOutline();
-        insertdelete.setVisible(true);
+        AdminPage admin = new AdminPage();
+        admin.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btn_back1ActionPerformed
 

@@ -112,8 +112,8 @@ public class IntroPage extends javax.swing.JFrame {
     }//GEN-LAST:event_lbl_adminMouseExited
 
     private void lbl_studentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_studentMouseClicked
-        LoginPage login = new LoginPage();
-        login.setVisible(true);
+        FirstPage first = new FirstPage();
+        first.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_lbl_studentMouseClicked
 

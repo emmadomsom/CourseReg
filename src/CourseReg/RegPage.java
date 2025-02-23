@@ -11,6 +11,7 @@ import java.awt.print.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import static java.awt.print.Printable.NO_SUCH_PAGE;
 import static java.awt.print.Printable.PAGE_EXISTS;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -27,7 +28,7 @@ public class RegPage extends javax.swing.JFrame {
     private Connection conn;
     private static final int PAGE_SIZE = 50;
     private int currentPage = 0;
-    //private String userRegNo;
+    
     
     private static final String DB_URL = "jdbc:mysql://localhost:3306/user_db";
     private static final String USER = "root";
@@ -57,7 +58,7 @@ public class RegPage extends javax.swing.JFrame {
         totalUnitsLabel = new JLabel("Total Units: 0/" + MAX_UNITS + " units");
         totalUnitsLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
         totalUnitsLabel.setHorizontalAlignment(JLabel.RIGHT);
-        //coursePanel.add(totalUnitsLabel, new AbsoluteConstraints(50, 300, 200, 30) );
+        
  
     }
      public void setCourses(ResultSet courses) {
@@ -338,7 +339,162 @@ public class RegPage extends javax.swing.JFrame {
        
        
 }
-         
+    private void addCourses(){
+        try{
+            String currentLevel = combo_level.getSelectedItem().toString();
+            int currentLevelNum = Integer.parseInt(currentLevel.split(" ")[0]);
+            String currentSession = combo_session.getSelectedItem().toString();
+            
+            JDialog dialog = new JDialog(this, "Select Additional Courses", true);
+            dialog.setLayout(new BorderLayout());
+            dialog.setSize(800, 600);
+            dialog.setLocationRelativeTo(this);
+            
+            JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            
+            JComboBox<String> levelComboBox = new JComboBox<>();
+            
+            boolean levelsAdded = false;
+            for(int i = 100; i < currentLevelNum; i += 100) {
+            levelComboBox.addItem(i + " LEVEL");
+            levelsAdded = true;
+        }
+            if (!levelsAdded) {
+            JOptionPane.showMessageDialog(this,
+                "No previous level courses available for your current level.",
+                "No Courses Available",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+            
+        
+          filterPanel.add(new JLabel("Level: "));
+          filterPanel.add(levelComboBox);
+            
+          
+          JTable courseTable = new JTable();
+          DefaultTableModel courseModel = new DefaultTableModel(
+            new String[]{"Select", "Course Name", "Course Code", "Unit Load"}, 0) {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                return column == 0 ? Boolean.class : 
+                       column == 3 ? Integer.class : String.class;
+            }
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 0;
+            }
+         };
+          courseTable.setModel(courseModel);
+          JScrollPane scrollPane = new JScrollPane(courseTable);
+          
+          JPanel buttonPanel = new JPanel();
+          JButton addButton = new JButton("Add Selected Courses");
+          JButton cancelButton = new JButton("Cancel");
+          
+          ActionListener loadCoursesListener = e -> {
+            try {
+                String sql = "SELECT course_name, course_code, unit_load FROM courses " +
+                            "WHERE level = ? AND semester = ? AND session = ?";
+                            
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, levelComboBox.getSelectedItem().toString());
+                pstmt.setString(2, combo_semester.getSelectedItem().toString());
+                pstmt.setString(3, currentSession);
+                
+                ResultSet rs = pstmt.executeQuery();
+                courseModel.setRowCount(0); // Clear existing rows
+                
+                while(rs.next()) {
+                    courseModel.addRow(new Object[]{
+                        false,
+                        rs.getString("course_name"),
+                        rs.getString("course_code"),
+                        rs.getInt("unit_load")
+                    });
+                }
+            }catch(SQLException ex){
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(dialog, 
+                    "Error loading courses: " + ex.getMessage());
+            }  
+          };
+          levelComboBox.addActionListener(loadCoursesListener);
+          
+          addButton.addActionListener(e -> {
+            DefaultTableModel mainModel = (DefaultTableModel) jTable1.getModel();
+            
+            for(int i = 0; i < courseModel.getRowCount(); i++) {
+                Boolean selected = (Boolean) courseModel.getValueAt(i, 0);
+                if(selected) {
+                    // Check if course is already added
+                    String courseCode = (String) courseModel.getValueAt(i, 2);
+                    boolean alreadyExists = false;
+                    
+                    for(int j = 0; j < mainModel.getRowCount(); j++) {
+                        if(courseCode.equals(mainModel.getValueAt(j, 2))) {
+                            alreadyExists = true;
+                            break;
+                        }
+                    }
+                    
+                    if(!alreadyExists) {
+                        // Calculate total units before adding
+                        int totalUnits = 0;
+                        for(int j = 0; j < mainModel.getRowCount(); j++) {
+                            Boolean isSelected = (Boolean) mainModel.getValueAt(j, 0);
+                            if(isSelected != null && isSelected) {
+                                totalUnits += (Integer) mainModel.getValueAt(j, 3);
+                            }
+                        }
+                        
+                        int newUnits = (Integer) courseModel.getValueAt(i, 3);
+                        if(totalUnits + newUnits > MAX_UNITS) {
+                            JOptionPane.showMessageDialog(dialog,
+                                "Cannot add course: Would exceed maximum units of " + MAX_UNITS,
+                                "Unit Limit Exceeded",
+                                JOptionPane.WARNING_MESSAGE);
+                            continue;
+                        }
+                        
+                        mainModel.addRow(new Object[]{
+                            false,
+                            courseModel.getValueAt(i, 1),
+                            courseCode,
+                            newUnits
+                        });
+                        } else {
+                        JOptionPane.showMessageDialog(dialog,
+                            "Course " + courseCode + " is already in your registration list.",
+                            "Duplicate Course",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+            updateTotalUnits();
+            dialog.dispose();
+        });
+          
+          cancelButton.addActionListener(e -> dialog.dispose());
+          buttonPanel.add(addButton);
+          buttonPanel.add(cancelButton);
+          
+          dialog.add(filterPanel, BorderLayout.NORTH);
+          dialog.add(scrollPane, BorderLayout.CENTER);
+          dialog.add(buttonPanel, BorderLayout.SOUTH);
+          
+          if(levelComboBox.getItemCount() > 0) {
+            loadCoursesListener.actionPerformed(null);
+        }
+        
+        dialog.setVisible(true);
+          
+    }catch(Exception ex){
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, 
+            "Error loading course selection dialog: " + ex.getMessage());
+    }
+  }  
                 
     
         @SuppressWarnings("unchecked")
@@ -364,6 +520,7 @@ public class RegPage extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         btn_back = new javax.swing.JButton();
         btn_Register = new javax.swing.JButton();
+        btn_addcourses = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -469,6 +626,17 @@ public class RegPage extends javax.swing.JFrame {
         });
         getContentPane().add(btn_Register, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 760, 350, -1));
 
+        btn_addcourses.setBackground(new java.awt.Color(0, 102, 102));
+        btn_addcourses.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        btn_addcourses.setForeground(new java.awt.Color(255, 255, 255));
+        btn_addcourses.setText("ADD COURSES");
+        btn_addcourses.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_addcoursesActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btn_addcourses, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 720, 160, 30));
+
         setBounds(0, 0, 1601, 909);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -505,6 +673,10 @@ public class RegPage extends javax.swing.JFrame {
        
     }//GEN-LAST:event_combo_sessionActionPerformed
 
+    private void btn_addcoursesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addcoursesActionPerformed
+        addCourses();
+    }//GEN-LAST:event_btn_addcoursesActionPerformed
+
     
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(() -> {
@@ -531,6 +703,7 @@ public class RegPage extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_Register;
+    private javax.swing.JButton btn_addcourses;
     private javax.swing.JButton btn_back;
     private javax.swing.JComboBox<String> combo_level;
     private javax.swing.JComboBox<String> combo_semester;
